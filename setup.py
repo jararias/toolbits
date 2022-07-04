@@ -12,5 +12,5 @@ setuptools.setup(
     author_email='jararias at uma.es',
     url='',
     description='A variety of tools',
-    packages=find_packages(where='toolbits'),
+    packages=find_packages(),
 )

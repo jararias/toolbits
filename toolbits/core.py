@@ -259,7 +259,7 @@ def write_netcdf(out_fn, variables, global_attributes={}, var_options={},
 @warningfilter('ignore', UserWarning)
 def read_netcdf(fn_or_fns, skip_variables=None):
 
-    dispatcher = netCDF4.Dataset isinstance(fn_or_fns, str) else netCDF4.MFDataset
+    dispatcher = netCDF4.Dataset if isinstance(fn_or_fns, str) else netCDF4.MFDataset
 
     cdf_variables = {}
     cdf_attributes = {}

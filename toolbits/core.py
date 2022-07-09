@@ -6,6 +6,10 @@ import warnings
 
 import numpy as np
 import netCDF4
+from loguru import logger
+
+
+logger.disable(__name__)
 
 
 def warningfilter(action, category=RuntimeWarning):
@@ -253,15 +257,14 @@ def write_netcdf(out_fn, variables, global_attributes={}, var_options={},
 
 
 @warningfilter('ignore', UserWarning)
-def read_netcdf(fn, skip_variables=None):
+def read_netcdf(fn_or_fns, skip_variables=None):
 
-    if not os.path.exists(fn):
-        raise ValueError('missing file {}'.format(fn))
+    dispatcher = netCDF4.Dataset isinstance(fn_or_fns, str) else netCDF4.MFDataset
 
     cdf_variables = {}
     cdf_attributes = {}
 
-    with netCDF4.Dataset(fn, mode='r') as cdf:
+    with dispatcher(fn_or_fns, mode='r') as cdf:
 
         # so that dimensions come before variables in the dictionary...
         dimensions = list(cdf.dimensions.keys())
@@ -272,7 +275,7 @@ def read_netcdf(fn, skip_variables=None):
                 variables = list(set(variables).difference(skip_variables))
 
         for var_name in dimensions + variables:
-            print(f'Reading {var_name}')
+            logger.debug(f'Reading {var_name}')
             var_dict = {}
             var_obj = cdf.variables.get(var_name, None)
             if var_obj is None and var_name in dimensions:

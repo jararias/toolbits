@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, division
 
 import os
 import warnings
+import functools
 
 import numpy as np
 import netCDF4
@@ -259,12 +260,15 @@ def write_netcdf(out_fn, variables, global_attributes={}, var_options={},
 @warningfilter('ignore', UserWarning)
 def read_netcdf(fn_or_fns, skip_variables=None):
 
-    dispatcher = netCDF4.Dataset if isinstance(fn_or_fns, str) else netCDF4.MFDataset
+    dispatcher = (
+        functools.partial(netCDF4.Dataset, mode='r')
+        if isinstance(fn_or_fns, str) else netCDF4.MFDataset
+    )
 
     cdf_variables = {}
     cdf_attributes = {}
 
-    with dispatcher(fn_or_fns, mode='r') as cdf:
+    with dispatcher(fn_or_fns) as cdf:
 
         # so that dimensions come before variables in the dictionary...
         dimensions = list(cdf.dimensions.keys())
